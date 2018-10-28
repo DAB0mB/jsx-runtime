@@ -54,6 +54,16 @@ const parseElement = (str) => {
   str = str.slice(length)
   node.length += length
 
+  let child = parseElement(str)
+
+  while (child.type === types.element || child.value) {
+    length = child.length
+    str = str.slice(length)
+    node.length += length
+    node.children.push(child)
+    child = parseElement(str)
+  }
+
   return node
 }
 
