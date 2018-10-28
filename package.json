@@ -1,5 +1,6 @@
 {
   "name": "jsx-runtime",
+  "version": "0.1.0",
   "description": "A runtime version of JSX",
   "main": "build/jsx-runtime.js",
   "repository": {
