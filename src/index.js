@@ -1,9 +1,29 @@
+import React from 'react'
+
 const placeholder = `__jsxPlaceholder${Date.now()}`
 
 const types = {
   element: 'element',
   value: 'value',
   props: 'props',
+}
+
+export const jsx = (splits, ...values) => {
+  const root = parseElement(splits.join(placeholder), values)
+
+  return createReactElement(root)
+}
+
+const createReactElement = (node) => {
+  if (node.type === types.value) {
+    return node.value
+  }
+
+  return React.createElement(
+    node.tag,
+    node.props.props,
+    ...node.children.map(createReactElement),
+  )
 }
 
 const parseElement = (str, values) => {
@@ -168,3 +188,5 @@ const parseValues = (str, values) => {
 
   return nodes
 }
+
+export default jsx
