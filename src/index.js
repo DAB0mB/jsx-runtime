@@ -64,6 +64,12 @@ const parseElement = (str) => {
     child = parseElement(str)
   }
 
+  match = str.match(new RegExp(`</${node.name}>`))
+
+  if (!match) return node
+
+  node.length += match.index + match[0].length
+
   return node
 }
 
