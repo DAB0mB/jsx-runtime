@@ -29,6 +29,15 @@ const parseElement = (str) => {
   str = str.slice(length)
   node.length += length
 
+  match = str.match(/>/)
+
+  if (!match) return node
+
+  node.props = parseProps(str.slice(0, match.index), values)
+  length = node.props.length
+  str = str.slice(length)
+  node.length += length
+
   return node
 }
 
