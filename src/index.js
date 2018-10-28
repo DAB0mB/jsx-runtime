@@ -1,16 +1,18 @@
+const placeholder = `__jsxPlaceholder${Date.now()}`
+
 const types = {
   element: 'element',
   value: 'value',
   props: 'props',
 }
 
-const parseElement = (str) => {
+const parseElement = (str, values) => {
   let match
   let length
 
   const node = {
     type: types.element,
-    props: parseProps(''),
+    props: parseProps('', []),
     children: [],
     length: 0,
     name: '',
@@ -21,7 +23,7 @@ const parseElement = (str) => {
   if (!match) {
     str = str.split('<')[0]
 
-    return parseValue(str)
+    return parseValue(str, values)
   }
 
   node.name = match[1]
@@ -54,14 +56,14 @@ const parseElement = (str) => {
   str = str.slice(length)
   node.length += length
 
-  let child = parseElement(str)
+  let child = parseElement(str, values)
 
   while (child.type === types.element || child.value) {
     length = child.length
     str = str.slice(length)
     node.length += length
     node.children.push(child)
-    child = parseElement(str)
+    child = parseElement(str, values)
   }
 
   match = str.match(new RegExp(`</${node.name}>`))
@@ -73,7 +75,7 @@ const parseElement = (str) => {
   return node
 }
 
-const parseProps = (str) => {
+const parseProps = (str, values) => {
   let match
   let length
 
@@ -107,7 +109,7 @@ const parseProps = (str) => {
   return node
 }
 
-const parseValue = (str) => {
+const parseValue = (str, values) => {
   return {
     type: types.value,
     length: str.length,
