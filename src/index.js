@@ -95,6 +95,7 @@ const parseProps = (str, values) => {
   const matchNextProp = () => {
     match =
       str.match(/ *\w+="(?:.*[^\\]")?/) ||
+      str.match(new RegExp(` *\\w+=${placeholder}`)) ||
       str.match(/ *\w+/)
   }
 
@@ -106,7 +107,9 @@ const parseProps = (str, values) => {
     node.length += propStr.length
     key = key.trim()
     value = value.join('=')
-    value = value ? value.slice(1, -1) : true
+    value =
+      value === placeholder ? values.shift() :
+      value ? value.slice(1, -1) : true
     node.props[key] = value
     str = str.slice(0, match.index) + str.slice(match.index + propStr.length)
 
