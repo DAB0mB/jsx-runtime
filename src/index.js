@@ -23,7 +23,7 @@ const parseElement = (str, values) => {
   if (!match) {
     str = str.split('<')[0]
 
-    return parseValue(str, values)
+    return parseValues(str, values)
   }
 
   node.name = match[1]
@@ -57,14 +57,26 @@ const parseElement = (str, values) => {
   str = str.slice(length)
   node.length += length
 
-  let child = parseElement(str, values)
+  let children = []
 
-  while (child.type === types.element || child.value) {
-    length = child.length
-    str = str.slice(length)
-    node.length += length
-    node.children.push(child)
-    child = parseElement(str, values)
+  const parseNextChildren = () => {
+    children = [].concat(parseElement(str, values))
+  }
+
+  parseNextChildren()
+
+  while (children.length) {
+    children.forEach((child) => {
+      length = child.length
+      str = str.slice(length)
+      node.length += length
+
+      if (child.type !== types.value || child.value) {
+        node.children.push(child)
+      }
+    })
+
+    parseNextChildren()
   }
 
   match = str.match(new RegExp(`</${node.name}>`))
@@ -119,10 +131,40 @@ const parseProps = (str, values) => {
   return node
 }
 
-const parseValue = (str, values) => {
-  return {
-    type: types.value,
-    length: str.length,
-    value: str.trim(),
-  }
+const parseValues = (str, values) => {
+  const nodes = []
+
+  str.split(placeholder).forEach((split, index, splits) => {
+    let value
+    let length
+
+    value = split
+    length = split.length
+    str = str.slice(length)
+
+    if (length) {
+      nodes.push({
+        type: types.value,
+        length,
+        value,
+      })
+    }
+
+    if (index === splits.length - 1) return
+
+    value = values.pop()
+    length = placeholder.length
+
+    if (typeof value === 'string') {
+      value = value.trim()
+    }
+
+    nodes.push({
+      type: types.value,
+      length,
+      value,
+    })
+  })
+
+  return nodes
 }
