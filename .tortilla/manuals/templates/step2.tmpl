@@ -1,0 +1,32 @@
+Now we're gonna add string interpolation on top of the HTML string parsing logic. Since we still wanna use the power of regexp at its full potential, we're gonna assume that the given string would be a template with placeholders, where each of them should be replaced with a value. That would be the easiest and most efficient way, rather than accepting an array of string splits.
+
+```json
+[
+  "<__jsxPlaceholder>Hello __jsxPlaceholder</__jsxPlaceholder>",
+  [MyComponent, "World", MyComponent]
+]
+```
+
+Accordingly, we will update the parsing functions' signature and their calls, and we will define a placeholder constant:
+
+{{{diffStep 2.1}}}
+
+Note how I used the `Date.now()` function to define a postfix for the placeholder. This we can be sure that the same value won't be given by the user as a string (possible, very unlikely). Now we will go through each parsing function and we'll make sure that it knows how to deal with placeholders correctly. We will start with the `parseElement()` function.
+
+We will add an additional property to the node called: `node.tag`. The tag property is the component that will be used to create the React element. It can either be a string or a React.Component. If `node.name` is a placeholder, we will be taking the next value in the given values stack:
+
+{{{diffStep 2.2}}}
+
+We also made sure that the closing tag matches the opening tag. I've decided to "swallow" errors rather than throwing them for the sake of simplicity, but generally speaking it would make a lot of sense to implement error throws within the parsing functions.
+
+Up next would be the props node. This is fairly simple, we're only gonna add an additional regexp to the array of matchers, and that regexp will check for placeholders. If a placeholder was detected, we're gonna replace it with the next value in the values stack:
+
+{{{diffStep 2.3}}}
+
+Last but not least, would be the value node. This is the most complex to handle out of the 3 nodes, since it requires us to split the input string and create a dedicated value node out of each split. So now, instead of returning a single node value, we will return an array of them. Accordingly, we will also be changing the name of the function from `parseValue()` to `parseValues()`:
+
+{{{diffStep 2.4}}}
+
+The reason why I've decided to return an array of nodes and not a singe node which contains an array of values, just like the props node, is because it matches the signature of `React.createElement()` perfectly. The values will be passed as children with a spread operator (`...`), and you should see further this tutorial how this well it fits.
+
+Note that we've also changed the way we accumulate children in the `parseElement()` function. Since `parseValues()` returns an array now, and not a single node, we flatten it using an empty array concatenation (`[].concat()`), and we only push the children whose contents are not empty.
