@@ -27,6 +27,7 @@ const parseElement = (str, values) => {
   }
 
   node.name = match[1]
+  node.tag = node.name === placeholder ? values.shift() : node.name
   length = match.index + match[0].length
   str = str.slice(length)
   node.length += length
@@ -71,6 +72,12 @@ const parseElement = (str, values) => {
   if (!match) return node
 
   node.length += match.index + match[0].length
+
+  if (node.name === placeholder) {
+    const value = values.shift()
+
+    if (value !== node.tag) return node
+  }
 
   return node
 }
