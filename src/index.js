@@ -38,6 +38,22 @@ const parseElement = (str) => {
   str = str.slice(length)
   node.length += length
 
+  match = str.match(/^ *\/ *>/)
+
+  if (match) {
+    node.length += match.index + match[0].length
+
+    return node
+  }
+
+  match = str.match(/>/)
+
+  if (!match) return node
+
+  length = match.index + 1
+  str = str.slice(length)
+  node.length += length
+
   return node
 }
 
