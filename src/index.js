@@ -16,6 +16,19 @@ const parseElement = (str) => {
     name: '',
   }
 
+  match = str.match(/<(\w+)/)
+
+  if (!match) {
+    str = str.split('<')[0]
+
+    return parseValue(str)
+  }
+
+  node.name = match[1]
+  length = match.index + match[0].length
+  str = str.slice(length)
+  node.length += length
+
   return node
 }
 
