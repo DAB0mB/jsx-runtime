@@ -1,0 +1,19 @@
+At this point we should have a function which can transform a JSX code into an AST, including string interpolation. The only thing which is left to do now is build a function which will recursively create React elements out of the nodes in the tree.
+
+The main function of the module should be called with a template tag. If you went through the previous step, you should know that a consistent string has an advantage over an array of splits of strings, since we can unleash the full potential of a regexp with ease. Accordingly, we will take all the given splits and join them with the `placeholder` constant.
+
+```
+['<', '> Hello ', '</', '>'] -> '<__jsxPlaceholder>Hello __jsxPlaceholder</__jsxPlaceholder>'
+```
+
+Once we join the string we can create React elements recursively:
+
+{{{diffStep 3.1}}}
+
+Note that if a node of value type is being iterated, we will just return the raw string, otherwise we will try to address its `node.children` property which doesn't exist.
+
+---
+
+Our JSX runtime is now ready to use. You can view the source code at the official [Github repository](https://github.com/DAB0mB/jsx-runtime) or you can download using NPM and require via Node.JS:
+
+    $ npm install jsx-runtime
